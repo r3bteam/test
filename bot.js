@@ -1,3 +1,4 @@
+const Discord = require('discord.js');
 const {Client , RichEmbed} = require('discord.js');
 const client = new Client(); 
 var dat = JSON.parse("{}");
