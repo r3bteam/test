@@ -1,72 +1,45 @@
 const Discord = require('discord.js');
 const {Client , RichEmbed} = require('discord.js');
 const client = new Client(); 
-var dat = JSON.parse("{}");
-function forEachObject(obj, func) {
-    Object.keys(obj).forEach(function (key) { func(key, obj[key]) })
-}
-client.on("ready", () => {
-    var guild;
-    while (!guild)
-        guild = client.guilds.find("name", "Lol..")//حط اسم السرفر مكان eyad..
-    guild.fetchInvites().then((data) => {
-        data.forEach((Invite, key, map) => {
-            var Inv = Invite.code;
-            dat[Inv] = Invite.uses;
-        })
-    })
+client.on("ready", async () => {
+	console.log(`Logged in as ${client.user.tag}!`);
+	  client.user.setActivity(`VieuxTumblr.`, { type: "WATCHING" });  });
+client.on('message', message => {
+  if(!message.channel.guild) return;
+var prefix = "#";
+if(message.content.startsWith(prefix + 'obc')) {
+if(!message.channel.guild) return message.channel.send('**هذا الأمر فقط للسيرفرات**').then(m => m.delete(5000));
+if(!message.member.hasPermission('ADMINISTRATOR')) return      message.channel.send('**للأسف لا تمتلك صلاحية** `ADMINISTRATOR`' );
+let args = message.content.split(" ").join(" ").slice(2 + prefix.length);
+let copy = "Dragon";
+let request = `Requested By ${message.author.username}`;
+if (!args) return message.reply('**يجب عليك كتابة كلمة او جملة لإرسال البرودكاست**');message.channel.send(`**هل أنت متأكد من إرسالك البرودكاست؟ \nمحتوى البرودكاست:** \` ${args}\``).then(msg => {
+msg.react('✅')
+.then(() => msg.react('❌'))
+.then(() =>msg.react('✅'))
+
+let reaction1Filter = (reaction, user) => reaction.emoji.name === '✅' && user.id === message.author.id;
+let reaction2Filter = (reaction, user) => reaction.emoji.name === '❌' && user.id === message.author.id;
+
+let reaction1 = msg.createReactionCollector(reaction1Filter, { time: 12000 });
+let reaction2 = msg.createReactionCollector(reaction2Filter, { time: 12000 });
+
+reaction1.on("collect", r => {
+message.channel.send(`☑ | Done ... The Broadcast Message Has Been Sent For ${message.guild.members.size} Members`).then(m => m.delete(5000));
+message.guild.members.forEach(m => {
+
+m.send(args)
+msg.delete();
 })
-client.on("guildMemberAdd", (member) => {
-    let channel = member.guild.channels.find('name', 'chat');// حط اسم الروم بدل codes
-    if (!channel) {
-        console.log("i have Error !!");
-        return;
-    }
-			 	         var currentTime = new Date(),
-		  hours = currentTime.getHours() + 4 ,
-          hours2 = currentTime.getHours() + 1 ,             
-		   minutes = currentTime.getMinutes(),             
-		   seconds = currentTime.getSeconds(),
-            Year = currentTime.getFullYear(),
-            Month = currentTime.getMonth() + 1,
-            Day = currentTime.getDate();
-             if(hours2 > 12) {
-               hours2 -= 12;
-            } else if(hours2 == 0) {
-                hours2 = "12";
-            
-            }  
-            var suffix = 'AM';
-            if (hours >= 12) {
-                suffix = 'PM';
-                hours = hours - 12;	
-            }
-            if (hours == 0) {
-                hours = 12;
-            }
-         var ee = member.user;
-		     var guild;
-    while (!guild)
-        guild = client.guilds.find("name", "Lol..")//حط اسم السرفر مكان eyad..
-    guild.fetchInvites().then((data) => {
-        data.forEach((Invite, key, map) => {
-
-            var Inv = Invite.code;
-            if (dat[Inv])
-                if (dat[Inv] < Invite.uses) {
-                    console.log(3);
-                    console.log(`${member} joined over ${Invite.inviter}'s invite ${Invite.code}`)
-ee.send(`We Thank ${Invite.inviter}\nFor he has brought you into the server \nYou are logged in from this link https://discord.gg/${Invite.code}`);
- channel.send({embed : new Discord.RichEmbed()
-       .setColor('RANDOM')
-       .setThumbnail(ee.avatarURL)
-       .setTitle(`**New Member !! **`)	
-       .setDescription(`1- Invited By : ${Invite.inviter} \n2- Link Invited : https://discord.gg/${Invite.code} \n3- Member Name : ${member} \n4- Member ID : ${member.id} \n5- Data : ${Day}-${Month}-${Year} \n6- Time : ${hours2}:${minutes}:${seconds} ${suffix}`)
-	   });
-            dat[Inv] = Invite.uses;
- }
-         })
-    })
-
-	});
+})
+reaction2.on("collect", r => {
+message.channel.send(`**Broadcast Canceled.**`).then(m => m.delete(5000));
+msg.delete();
+})
+})
+}
+});
+client.on('guildMemberAdd', (member) => {
+member.addRole(member.guild.roles.find('name', 'Vieux'));
+});
   client.login(process.env.BOT_TOKEN);
